@@ -1,0 +1,122 @@
+package application;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+public class Calculadora extends JFrame implements ActionListener {
+
+    // Definindo componentes da interface
+    private JTextField display;
+    private StringBuilder currentInput = new StringBuilder();
+    private double result = 0;
+    private String operator = "";
+    private boolean isOperatorClicked = false;
+
+    public Calculadora() {
+        // Configuração da janela
+        setTitle("Calculadora");
+        setSize(400, 500);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+        setLayout(new BorderLayout());
+
+        // Campo de exibição
+        display = new JTextField();
+        display.setFont(new Font("Arial", Font.PLAIN, 20));
+        display.setEditable(false);
+        display.setHorizontalAlignment(JTextField.RIGHT);
+        add(display, BorderLayout.CENTER);
+
+        // Painel de botões
+        JPanel panel = new JPanel();
+        panel.setLayout(new GridLayout(5, 4, 10, 12));
+
+        // Botões numéricos
+        String[] buttonLabels = {
+            "7", "8", "9", "/",
+            "4", "5", "6", "*",
+            "1", "2", "3", "-",
+            "C", "0", "=", "+"
+        };
+
+        for (String label : buttonLabels) {
+            JButton button = new JButton(label);
+            button.setFont(new Font("Arial", Font.PLAIN, 24));
+            button.addActionListener(this);
+            panel.add(button);
+        }
+
+        add(panel, BorderLayout.CENTER);
+    }
+
+    // Função para manipular eventos dos botões
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        String command = e.getActionCommand();
+
+        if (command.equals("C")) {
+            currentInput.setLength(0); // Limpar a entrada
+            display.setText("");
+            result = 0;
+            operator = "";
+            isOperatorClicked = false;
+        } else if (command.equals("=")) {
+            calculateResult();
+            display.setText(String.valueOf(result));
+            currentInput.setLength(0);
+            isOperatorClicked = false;
+        } else if ("+-*/".contains(command)) {
+            if (isOperatorClicked) {
+                operator = command;
+            } else {
+                if (currentInput.length() > 0) {
+                    result = Double.parseDouble(currentInput.toString());
+                    currentInput.setLength(0); // Limpar entrada para o próximo número
+                }
+                operator = command;
+                isOperatorClicked = true;
+            }
+        } else {
+            if (isOperatorClicked) {
+                currentInput.setLength(0);
+                isOperatorClicked = false;
+            }
+            currentInput.append(command);
+            display.setText(currentInput.toString());
+        }
+    }
+
+    // Função para calcular o resultado da operação
+    private void calculateResult() {
+        double currentNumber = Double.parseDouble(currentInput.toString());
+
+        switch (operator) {
+            case "+":
+                result += currentNumber;
+                break;
+            case "-":
+                result -= currentNumber;
+                break;
+            case "*":
+                result *= currentNumber;
+                break;
+            case "/":
+                if (currentNumber != 0) {
+                    result /= currentNumber;
+                } else {
+                    display.setText("Erro");
+                    return;
+                }
+                break;
+        }
+    }
+
+    // Método principal para iniciar a aplicação
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            Calculadora calculator = new Calculadora();
+            calculator.setVisible(true);
+        });
+    }
+}

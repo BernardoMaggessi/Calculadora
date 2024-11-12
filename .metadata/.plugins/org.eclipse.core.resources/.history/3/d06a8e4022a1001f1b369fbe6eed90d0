@@ -1,0 +1,32 @@
+package application;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+public class App {
+
+    public static void main(String[] args) {
+        // Create the frame (window)
+        JFrame frame = new JFrame("Simple Swing App");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);  // Exit the application when the window is closed
+        frame.setSize(300, 200);  // Set the size of the window
+
+        // Create a button
+        JButton button = new JButton("Click Me!");
+
+        // Add an action listener to the button to handle the click event
+        button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JOptionPane.showMessageDialog(frame, "Button was clicked!");
+            }
+        });
+
+        // Add the button to the frame
+        frame.getContentPane().add(button);
+
+        // Make the frame visible
+        frame.setVisible(true);
+    }
+}

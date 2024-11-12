@@ -1,0 +1,124 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+public class Calculadora extends JFrame implements ActionListener {
+
+    private JTextField display;
+    private StringBuilder currentInput = new StringBuilder();
+    private double result = 0;
+    private String operator = "";
+    private boolean isOperatorClicked = false;
+
+    public Calculadora() {
+        // Configuração da janela
+        setTitle("Calculadora");
+        setSize(400, 500);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+        setLayout(new BorderLayout());
+
+        // Campo de exibição
+        display = new JTextField();
+        display.setFont(new Font("Arial", Font.PLAIN, 30));
+        display.setEditable(false);
+        display.setHorizontalAlignment(JTextField.RIGHT);
+        add(display, BorderLayout.NORTH);
+
+        // Painel de botões
+        JPanel panel = new JPanel();
+        panel.setLayout(new GridLayout(4, 4, 10, 10));
+
+        // Botões numéricos e operadores
+        String[] buttonLabels = {
+            "7", "8", "9", "/",
+            "4", "5", "6", "*",
+            "1", "2", "3", "-",
+            "C", "0", "=", "+"
+        };
+
+        for (String label : buttonLabels) {
+            JButton button = new JButton(label);
+
+            // Personalizando os botões
+            button.setFont(new Font("Arial", Font.BOLD, 20));
+            button.setForeground(Color.WHITE); // Cor da fonte
+            if ("C=+-*/".contains(label)) {
+                button.setBackground(new Color(70, 130, 180)); // Cor de fundo para operadores
+            } else {
+                button.setBackground(new Color(50, 50, 50)); // Cor de fundo para números
+            }
+            button.setFocusPainted(false); // Remover o foco em torno do botão ao clicar
+            button.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY, 2)); // Bordas personalizadas
+
+            button.addActionListener(this);
+            panel.add(button);
+        }
+
+        add(panel, BorderLayout.CENTER);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        String command = e.getActionCommand();
+
+        if (command.equals("C")) {
+            currentInput.setLength(0); // Limpar a entrada
+            display.setText("");
+            result = 0;
+            operator = "";
+            isOperatorClicked = false;
+        } else if (command.equals("=")) {
+            calculateResult();
+            display.setText(String.valueOf(result));
+            currentInput.setLength(0);
+            isOperatorClicked = false;
+        } else if ("+-*/".contains(command)) {
+            if (!isOperatorClicked && currentInput.length() > 0) {
+                result = Double.parseDouble(currentInput.toString());
+                currentInput.setLength(0);
+            }
+            operator = command;
+            isOperatorClicked = true;
+        } else {
+            if (isOperatorClicked) {
+                currentInput.setLength(0);
+                isOperatorClicked = false;
+            }
+            currentInput.append(command);
+            display.setText(currentInput.toString());
+        }
+    }
+
+    private void calculateResult() {
+        double currentNumber = Double.parseDouble(currentInput.toString());
+
+        switch (operator) {
+            case "+":
+                result += currentNumber;
+                break;
+            case "-":
+                result -= currentNumber;
+                break;
+            case "*":
+                result *= currentNumber;
+                break;
+            case "/":
+                if (currentNumber != 0) {
+                    result /= currentNumber;
+                } else {
+                    display.setText("Erro");
+                    return;
+                }
+                break;
+        }
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            Calculadora calculator = new Calculadora();
+            calculator.setVisible(true);
+        });
+    }
+}

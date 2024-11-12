@@ -1,0 +1,21 @@
+package application;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+public class Calculadora extends JFrame implements ActionListener{
+
+    public static void main(String[] args) {
+    	//definindo componentes da interface
+    	JTextField display;
+    	StringBuilder currentInput = new StringBuilder();
+    	double result = 0;
+    	String operator = "";
+    	boolean isOperatorClicked = false;
+    	
+    	public App() {
+    		
+    	}
+    } 	
+}

@@ -1,0 +1,147 @@
+package application;
+
+import javax.swing.*; 
+import java.awt.*; 
+import java.awt.event.ActionEvent; 
+import java.awt.event.ActionListener; 
+
+
+public class Calculadora extends JFrame implements ActionListener {
+
+    // Campo de exibição (display) onde os números e resultados são mostrados
+    private JTextField display;
+    // StringBuilder para armazenar a entrada atual digitada pelo usuário
+    private StringBuilder currentInput = new StringBuilder();
+
+    // Variáveis para armazenar o resultado das operações e o operador atual
+    private double result = 0;
+    private String operator = "";
+    private boolean isOperatorClicked = false; // Indica se um operador foi clicado
+
+    // Construtor da classe Calculadora, que configura a interface gráfica
+    public Calculadora() {
+        // Configuração básica da janela (título, tamanho, comportamento ao fechar)
+        setTitle("Calculadora");
+        setSize(400, 500);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Fecha a aplicação ao fechar a janela
+        setLocationRelativeTo(null); // Centraliza a janela na tela
+        setLayout(new BorderLayout()); // Define o layout da janela
+
+        // Configuração do campo de exibição (display)
+        display = new JTextField();
+        display.setFont(new Font("Arial", Font.PLAIN, 30)); // Define a fonte do texto
+        display.setEditable(false); // Impede que o usuário edite o texto diretamente
+        display.setHorizontalAlignment(JTextField.RIGHT); // Alinha o texto à direita
+        add(display, BorderLayout.NORTH); // Adiciona o display na parte superior da janela
+
+        // Painel para organizar os botões em uma grade de 4x4
+        JPanel panel = new JPanel();
+        panel.setLayout(new GridLayout(4, 4, 10, 10)); // Layout de grade com espaçamento entre botões
+
+        // Rótulos dos botões (números e operadores)
+        String[] buttonLabels = {
+            "7", "8", "9", "/",
+            "4", "5", "6", "*",
+            "1", "2", "3", "-",
+            "C", "0", "=", "+"
+        };
+
+        // Loop para criar e estilizar cada botão
+        for (String label : buttonLabels) {
+            JButton button = new JButton(label); // Cria um botão com o texto do rótulo
+
+            // Estilizando o botão
+            button.setFont(new Font("Arial", Font.BOLD, 20)); // Define a fonte do botão
+            button.setForeground(Color.WHITE); // Define a cor do texto como branco
+
+            // Define a cor de fundo com base no tipo de botão (operador ou número)
+            if ("C=+-*/".contains(label)) {
+                button.setBackground(new Color(70, 130, 180)); // Cor azul para operadores e "C"
+            } else {
+                button.setBackground(new Color(50, 50, 50)); // Cor cinza escuro para números
+            }
+
+            button.setFocusPainted(false); // Remove o efeito de foco ao clicar no botão
+            button.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY, 2)); // Adiciona uma borda personalizada
+
+            button.addActionListener(this); // Adiciona um ActionListener para tratar cliques no botão
+            panel.add(button); // Adiciona o botão ao painel
+        }
+
+        add(panel, BorderLayout.CENTER); // Adiciona o painel de botões ao centro da janela
+    }
+
+    // Método que trata os eventos de clique nos botões
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        String command = e.getActionCommand(); // Obtém o texto do botão que foi clicado
+
+        // Limpar a entrada e redefinir o estado se "C" for clicado
+        if (command.equals("C")) {
+            currentInput.setLength(0); // Limpa o texto armazenado
+            display.setText(""); // Limpa o display
+            result = 0; // Redefine o resultado
+            operator = ""; // Redefine o operador
+            isOperatorClicked = false; // Redefine o estado do operador
+        }
+        // Calcula o resultado se "=" for clicado
+        else if (command.equals("=")) {
+            calculateResult(); // Chama o método para calcular o resultado
+            display.setText(String.valueOf(result)); // Exibe o resultado no display
+            currentInput.setLength(0); // Limpa o texto armazenado
+            isOperatorClicked = false; // Redefine o estado do operador
+        }
+        // Trata cliques em operadores (+, -, *, /)
+        else if ("+-*/".contains(command)) {
+            if (!isOperatorClicked && currentInput.length() > 0) {
+                result = Double.parseDouble(currentInput.toString()); // Armazena o número atual
+                currentInput.setLength(0); // Limpa o texto armazenado para a próxima entrada
+            }
+            operator = command; // Armazena o operador atual
+            isOperatorClicked = true; // Define o estado do operador como clicado
+        }
+        // Trata cliques em botões numéricos
+        else {
+            if (isOperatorClicked) {
+                currentInput.setLength(0); // Limpa o texto se um operador foi clicado anteriormente
+                isOperatorClicked = false; // Redefine o estado do operador
+            }
+            currentInput.append(command); // Adiciona o número ao texto armazenado
+            display.setText(currentInput.toString()); // Exibe o texto atualizado no display
+        }
+    }
+
+    // Método que realiza a operação matemática com base no operador atual
+    private void calculateResult() {
+        double currentNumber = Double.parseDouble(currentInput.toString()); // Converte o texto para número
+
+        // Realiza a operação com base no operador
+        switch (operator) {
+            case "+":
+                result += currentNumber;
+                break;
+            case "-":
+                result -= currentNumber;
+                break;
+            case "*":
+                result *= currentNumber;
+                break;
+            case "/":
+                if (currentNumber != 0) { 
+                    result /= currentNumber; 
+                } else {
+                    display.setText("Erro"); // Exibe erro se tentar dividir por zero
+                    return;
+                }
+                break;
+        }
+    }
+
+    
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> { // Garante que a interface gráfica seja executada na thread correta
+            Calculadora calculator = new Calculadora(); // Cria uma nova instância da calculadora
+            calculator.setVisible(true); // Torna a janela visível
+        });
+    }
+}
